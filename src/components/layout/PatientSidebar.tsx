@@ -2,25 +2,50 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard,
+  Calendar,
   Search,
   Heart,
+  Bell,
   ShieldCheck,
   PhoneCall
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { useFavouritesStore } from '../../store/useFavouritesStore';
+import { useAppointmentStore } from '../../store/useAppointmentStore';
+import { useAuthStore } from '../../store/useAuthStore';
 
 export const PatientSidebar: React.FC = () => {
+  const { user } = useAuthStore();
   const { favouriteDoctorIds } = useFavouritesStore();
+  const { getUpcoming, getUnreadCount } = useAppointmentStore();
+
+  const patientId = user?.id || 'patient-1';
+  const upcomingCount = getUpcoming(patientId).length;
+  const unreadNotifCount = getUnreadCount();
 
   const navItems = [
     { to: '/patient/dashboard', label: 'Overview', icon: LayoutDashboard },
+    {
+      to: '/patient/appointments',
+      label: 'My Appointments',
+      icon: Calendar,
+      badge: upcomingCount > 0 ? upcomingCount : undefined,
+      badgeColor: 'bg-emerald-100 text-emerald-700'
+    },
     { to: '/find-doctors', label: 'Find Doctors', icon: Search },
     {
       to: '/patient/favourites',
       label: 'Saved Doctors',
       icon: Heart,
-      badge: favouriteDoctorIds.length > 0 ? favouriteDoctorIds.length : undefined
+      badge: favouriteDoctorIds.length > 0 ? favouriteDoctorIds.length : undefined,
+      badgeColor: 'bg-rose-100 text-rose-600'
+    },
+    {
+      to: '/patient/notifications',
+      label: 'Notifications',
+      icon: Bell,
+      badge: unreadNotifCount > 0 ? unreadNotifCount : undefined,
+      badgeColor: 'bg-amber-100 text-amber-800'
     }
   ];
 
@@ -54,7 +79,7 @@ export const PatientSidebar: React.FC = () => {
                     <span>{item.label}</span>
                   </div>
                   {item.badge !== undefined && (
-                    <span className="px-2 py-0.5 text-[10px] font-bold bg-rose-100 text-rose-600 rounded-full">
+                    <span className={cn('px-2 py-0.5 text-[10px] font-bold rounded-full', item.badgeColor)}>
                       {item.badge}
                     </span>
                   )}
@@ -64,7 +89,7 @@ export const PatientSidebar: React.FC = () => {
           </nav>
         </div>
 
-        {/* Future Modules Teaser Card */}
+        {/* PMDC Verification Badge */}
         <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-50 to-[#E6F4F1]/30 border border-slate-200/80">
           <div className="flex items-center gap-1.5 text-xs font-bold text-[#0D7A5F]">
             <ShieldCheck className="w-4 h-4" /> PMDC Verification

@@ -7,25 +7,43 @@ import {
   Calendar,
   LogOut,
   ChevronDown,
-  User
+  User,
+  CheckCheck,
+  ArrowRight
 } from 'lucide-react';
 import { Logo } from '../common/Logo';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useFavouritesStore } from '../../store/useFavouritesStore';
+import { useAppointmentStore } from '../../store/useAppointmentStore';
 import { useToastStore } from '../../store/useToastStore';
+import { NotificationItem } from '../appointment/NotificationItem';
 
 export const PatientNavbar: React.FC = () => {
   const { user, logout } = useAuthStore();
   const { favouriteDoctorIds } = useFavouritesStore();
+  const { notifications, getUnreadCount, markAllNotificationsRead, markNotificationRead } = useAppointmentStore();
   const { addToast } = useToastStore();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const navigate = useNavigate();
 
+  const unreadCount = getUnreadCount();
+  const recentNotifications = notifications.slice(0, 3);
+
   const handleLogout = () => {
     logout();
     addToast({ type: 'info', message: 'You have been logged out successfully.' });
     navigate('/login');
+  };
+
+  const handleNotificationClick = (notifId: string, appointmentId?: string) => {
+    markNotificationRead(notifId);
+    setShowNotifications(false);
+    if (appointmentId) {
+      navigate('/patient/appointments');
+    } else {
+      navigate('/patient/notifications');
+    }
   };
 
   return (
@@ -58,6 +76,16 @@ export const PatientNavbar: React.FC = () => {
 
           {/* Right Actions: Favourites, Notifications, Profile */}
           <div className="flex items-center gap-2.5 sm:gap-3">
+            {/* Appointments Link */}
+            <Link
+              to="/patient/appointments"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors"
+              title="My Appointments"
+            >
+              <Calendar className="w-4 h-4 text-[#0D7A5F]" />
+              <span>Appointments</span>
+            </Link>
+
             {/* Favourites Quick Link */}
             <Link
               to="/patient/favourites"
@@ -76,29 +104,57 @@ export const PatientNavbar: React.FC = () => {
             <div className="relative">
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
-                className="relative p-2 rounded-xl text-slate-600 hover:text-[#0D7A5F] hover:bg-slate-50 transition-colors"
+                className="relative p-2 rounded-xl text-slate-600 hover:text-[#0D7A5F] hover:bg-slate-50 transition-colors cursor-pointer"
                 title="Notifications"
               >
                 <Bell className="w-5 h-5" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#0D7A5F] ring-2 ring-white" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-amber-500 text-white text-[9px] font-extrabold flex items-center justify-center ring-2 ring-white">
+                    {unreadCount}
+                  </span>
+                )}
               </button>
 
               {showNotifications && (
-                <div className="absolute right-0 mt-2 w-80 rounded-2xl bg-white p-3 shadow-xl border border-slate-200 animate-in fade-in zoom-in-95 z-50">
+                <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-white p-3 shadow-xl border border-slate-200 animate-in fade-in zoom-in-95 z-50">
                   <div className="flex items-center justify-between pb-2 border-b border-slate-100 mb-2">
-                    <span className="text-xs font-bold text-slate-900">Notifications</span>
-                    <span className="text-[10px] text-[#0D7A5F] font-semibold cursor-pointer">Mark all as read</span>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="p-2.5 rounded-xl bg-[#E6F4F1]/60 text-xs">
-                      <div className="font-semibold text-slate-900 flex items-center gap-1.5">
-                        <Calendar className="w-3.5 h-3.5 text-[#0D7A5F]" /> Appointment Confirmed
-                      </div>
-                      <p className="text-slate-600 text-[11px] mt-0.5">
-                        Your consultation with Dr. Ayesha Khan is confirmed for Aug 28 at 04:30 PM (Clifton Clinic).
-                      </p>
-                      <span className="text-[10px] text-slate-400 mt-1 block">10 mins ago</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-slate-900">Notifications</span>
+                      {unreadCount > 0 && (
+                        <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
+                          {unreadCount} new
+                        </span>
+                      )}
                     </div>
+                    {unreadCount > 0 && (
+                      <button
+                        onClick={markAllNotificationsRead}
+                        className="text-[11px] text-[#0D7A5F] font-semibold flex items-center gap-1 hover:underline cursor-pointer"
+                      >
+                        <CheckCheck className="w-3.5 h-3.5" /> Mark all read
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="space-y-2 max-h-72 overflow-y-auto">
+                    {recentNotifications.map((notif) => (
+                      <NotificationItem
+                        key={notif.id}
+                        notification={notif}
+                        onClick={() => handleNotificationClick(notif.id, notif.appointmentId)}
+                      />
+                    ))}
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-100 mt-2 text-center">
+                    <Link
+                      to="/patient/notifications"
+                      onClick={() => setShowNotifications(false)}
+                      className="text-xs font-bold text-[#0D7A5F] hover:underline flex items-center justify-center gap-1"
+                    >
+                      <span>View All Notifications</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
                   </div>
                 </div>
               )}
@@ -108,7 +164,7 @@ export const PatientNavbar: React.FC = () => {
             <div className="relative">
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-slate-100 transition-colors focus:outline-none"
+                className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-slate-100 transition-colors focus:outline-none cursor-pointer"
               >
                 <div className="w-8 h-8 rounded-lg bg-[#0D7A5F] text-white font-bold flex items-center justify-center text-xs">
                   {user?.name ? user.name.split(' ').map((n) => n[0]).join('').slice(0, 2) : 'PT'}
@@ -134,6 +190,13 @@ export const PatientNavbar: React.FC = () => {
                     <User className="w-4 h-4" /> Dashboard
                   </Link>
                   <Link
+                    to="/patient/appointments"
+                    onClick={() => setIsDropdownOpen(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-[#E6F4F1] hover:text-[#0D7A5F] rounded-xl transition-colors"
+                  >
+                    <Calendar className="w-4 h-4" /> My Appointments
+                  </Link>
+                  <Link
                     to="/find-doctors"
                     onClick={() => setIsDropdownOpen(false)}
                     className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-[#E6F4F1] hover:text-[#0D7A5F] rounded-xl transition-colors"
@@ -149,7 +212,7 @@ export const PatientNavbar: React.FC = () => {
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-xl transition-colors mt-1"
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-xl transition-colors mt-1 cursor-pointer"
                   >
                     <LogOut className="w-4 h-4" /> Sign Out
                   </button>
