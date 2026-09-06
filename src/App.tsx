@@ -19,9 +19,12 @@ import { LoginPage } from './pages/auth/LoginPage';
 import { SignupPage } from './pages/auth/SignupPage';
 import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage';
 
-// Patient Portal Pages
+// Patient Portal Pages (Module 1 & Module 2)
 import { PatientDashboard } from './pages/patient/PatientDashboard';
+import { BookAppointmentPage } from './pages/patient/BookAppointmentPage';
+import { AppointmentHistoryPage } from './pages/patient/AppointmentHistoryPage';
 import { FavouriteDoctorsPage } from './pages/patient/FavouriteDoctorsPage';
+import { NotificationsPage } from './pages/patient/NotificationsPage';
 
 // Error Pages
 import { NotFoundPage } from './pages/errors/NotFoundPage';
@@ -59,7 +62,10 @@ export const App: React.FC = () => {
         >
           <Route index element={<Navigate to="/patient/dashboard" replace />} />
           <Route path="dashboard" element={<PatientDashboard />} />
+          <Route path="book/:doctorId" element={<BookAppointmentPage />} />
+          <Route path="appointments" element={<AppointmentHistoryPage />} />
           <Route path="favourites" element={<FavouriteDoctorsPage />} />
+          <Route path="notifications" element={<NotificationsPage />} />
         </Route>
 
         {/* 404 Catch-All */}

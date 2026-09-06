@@ -159,7 +159,7 @@ export const DoctorCard: React.FC<DoctorCardProps> = ({ doctor, className }) => 
               View Profile
             </Button>
           </Link>
-          <Link to={`/doctors/${doctor.id}#booking`}>
+          <Link to={`/patient/book/${doctor.id}`}>
             <Button variant="primary" size="sm" leftIcon={<Calendar className="w-3.5 h-3.5" />}>
               Book Slot
             </Button>

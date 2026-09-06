@@ -21,7 +21,7 @@
 
 ## 🗺️ 4-Module Internship Roadmap
 
-- [x] **MODULE 1: Foundation & Patient Discovery** *(Current Phase)*
+- [x] **MODULE 1: Foundation & Patient Discovery** *(Completed)*
   - React 19 + TypeScript + Vite + Tailwind CSS 4 setup.
   - Bespoke SmartCare clinical design system & tokens (Teal `#0D7A5F`, Slate, White, Soft Mint).
   - Public marketing website (Hero with live search, 12+ specialties, featured doctors, trust metrics, testimonials).
@@ -30,8 +30,14 @@
   - Advanced Doctor Discovery (`/find-doctors`) with multi-faceted filtering, fee slider, rating filter, and sorting.
   - Comprehensive Doctor Profile (`/doctors/:id`) with qualifications, PMDC badge, hospital history, clinic schedule, and reviews.
   - Saved / Favourite Doctors (`/patient/favourites`) with persistent `localStorage` bookmarking.
-- [ ] **MODULE 2: Appointment & Healthcare Workflows** *(Upcoming)*
-  - Doctor slot availability engine, 6-step appointment booking flow, in-clinic vs video consultation selection, appointment management (upcoming, completed, cancelled), and notification center.
+- [x] **MODULE 2: Appointment & Healthcare Workflows** *(Completed)*
+  - 4-step dynamic appointment booking wizard (`/patient/book/:doctorId`) with In-Clinic vs Video toggle (10% online discount).
+  - 7-day rolling slot availability engine with Morning, Afternoon, and Evening PKT consultation slots.
+  - Booking confirmation summary card and instant reference number generator (`SC-2026-XXXX`).
+  - Appointment Management Hub (`/patient/appointments`) with 3 tabs: Upcoming & Confirmed, Completed History, and Cancelled.
+  - Cancellation modal with 6 predefined reasons, custom notes, and automatic notification dispatch.
+  - Notification Center (`/patient/notifications`) and interactive topbar popover with unread badges.
+  - Live patient dashboard sync displaying real-time upcoming appointment cards and counters.
 - [ ] **MODULE 3: Doctor Portal & Analytics** *(Upcoming)*
   - Doctor dashboard, schedule manager (working hours, breaks, slot toggles), patient records list, and revenue analytics in PKR.
 - [ ] **MODULE 4: Admin Portal, QA & Final Optimization** *(Upcoming)*
@@ -67,13 +73,17 @@ smartcare-healthcare-portal/
 │   ├── components/
 │   │   ├── common/             # Button, Input, Select, Badge, Card, Avatar, Modal, ToastContainer, SkeletonLoader, EmptyState, Breadcrumb, RatingStars, Logo
 │   │   ├── layout/             # PublicHeader, PublicFooter, PatientNavbar, PatientSidebar, MobileNav
-│   │   └── doctor/             # DoctorCard, DoctorFilterSidebar, SpecialtyCard
+│   │   ├── doctor/             # DoctorCard, DoctorFilterSidebar, SpecialtyCard
+│   │   └── appointment/        # BookingStepIndicator, ConsultationTypeSelector, DatePicker, TimeSlotGrid, BookingConfirmCard, AppointmentCard, CancellationModal, NotificationItem
 │   ├── data/
 │   │   ├── mockDoctors.ts      # 12+ realistic Pakistani doctors (Karachi, Lahore, Islamabad, etc.)
 │   │   ├── mockSpecialties.ts  # 12 medical specialties with clinical descriptions
 │   │   ├── mockCities.ts       # Pakistani cities & sub-localities (Clifton, DHA, Gulshan, Blue Area)
 │   │   ├── mockReviews.ts      # Verified Pakistani patient reviews
-│   │   └── mockPatients.ts     # Demo patient profile & upcoming appointment
+│   │   ├── mockPatients.ts     # Demo patient profile (Muhammad Tariq)
+│   │   ├── mockAppointments.ts # Mock appointment history (confirmed, completed, cancelled)
+│   │   ├── mockNotifications.ts# Mock notification feed entries
+│   │   └── mockSlots.ts        # 7-day rolling slot availability generator
 │   ├── layouts/
 │   │   ├── PublicLayout.tsx    # Header + Outlet + Footer + Toasts
 │   │   ├── AuthLayout.tsx      # Centered card layout for Auth
@@ -82,20 +92,22 @@ smartcare-healthcare-portal/
 │   ├── pages/
 │   │   ├── public/             # LandingPage, AboutPage, ContactPage
 │   │   ├── auth/               # LoginPage, SignupPage, ForgotPasswordPage
-│   │   ├── patient/            # PatientDashboard, DoctorDiscoveryPage, DoctorProfilePage, FavouriteDoctorsPage
+│   │   ├── patient/            # PatientDashboard, DoctorDiscoveryPage, DoctorProfilePage, FavouriteDoctorsPage, BookAppointmentPage, AppointmentHistoryPage, NotificationsPage
 │   │   └── errors/             # NotFoundPage, UnauthorizedPage
 │   ├── services/
-│   │   └── doctorService.ts    # Filter, search, sort, and profile data service layer
+│   │   ├── doctorService.ts    # Filter, search, sort, and profile data service layer
+│   │   └── appointmentService.ts # Slot fetching, date formatting, countdown, filtering
 │   ├── store/
 │   │   ├── useAuthStore.ts     # Auth state, login/signup/logout, demo switcher
 │   │   ├── useFavouritesStore.ts # Saved doctors state with localStorage persistence
 │   │   ├── useFilterStore.ts   # Active discovery search & filter state
+│   │   ├── useAppointmentStore.ts # Booking wizard, appointment management, notification feed
 │   │   └── useToastStore.ts    # Global notification toast queue
 │   ├── types/
 │   │   ├── doctor.ts           # Doctor, Specialty, PakistaniCity, Review types
 │   │   ├── user.ts             # User, PatientProfile, HealthProfile
 │   │   ├── filter.ts           # DoctorFilterState, SortOption
-│   │   └── appointment.ts      # Appointment models & status types
+│   │   └── appointment.ts      # Appointment, TimeSlot, DoctorSlotDay, Notification types
 │   ├── utils/
 │   │   ├── formatters.ts       # formatPKR, formatPhonePK
 │   │   ├── constants.ts        # Pakistani cities, default filters, demo credentials
