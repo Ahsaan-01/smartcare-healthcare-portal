@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   ShieldCheck,
   MapPin,
@@ -171,11 +171,11 @@ export const DoctorProfilePage: React.FC = () => {
                 <Share2 className="w-4 h-4" />
               </button>
 
-              <a href="#booking">
+              <Link to={`/patient/book/${doctor.id}`}>
                 <Button variant="primary" size="md" leftIcon={<Calendar className="w-4 h-4" />}>
                   Book Appointment
                 </Button>
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -485,16 +485,16 @@ export const DoctorProfilePage: React.FC = () => {
                 </span>
               </div>
 
-              <Button
-                variant="primary"
-                size="md"
-                className="w-full"
-                onClick={() => {
-                  toast.success(`Booking slot selected with ${doctor.name}! (Module 2 appointment flow)`);
-                }}
-              >
-                Proceed to Booking (Module 2)
-              </Button>
+              <Link to={`/patient/book/${doctor.id}`} className="block">
+                <Button
+                  variant="primary"
+                  size="md"
+                  className="w-full"
+                  leftIcon={<Calendar className="w-4 h-4" />}
+                >
+                  Book Appointment Now
+                </Button>
+              </Link>
 
               <p className="text-[10px] text-center text-slate-400">
                 Instant confirmation • No upfront credit card required
