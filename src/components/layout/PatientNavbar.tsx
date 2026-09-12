@@ -9,7 +9,8 @@ import {
   ChevronDown,
   User,
   CheckCheck,
-  ArrowRight
+  ArrowRight,
+  ShieldCheck
 } from 'lucide-react';
 import { Logo } from '../common/Logo';
 import { useAuthStore } from '../../store/useAuthStore';
@@ -56,6 +57,15 @@ export const PatientNavbar: React.FC = () => {
             <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-[#E6F4F1] text-[#0D7A5F]">
               Patient Portal
             </span>
+            {(user?.role === 'doctor' || user?.role === 'admin') && (
+              <Link
+                to="/doctor/dashboard"
+                className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold bg-[#0D7A5F] text-white rounded-xl hover:bg-[#084E3D] transition-colors shadow-2xs"
+              >
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Doctor Portal</span>
+              </Link>
+            )}
           </div>
 
           {/* Quick Search Shortcut */}
@@ -182,6 +192,15 @@ export const PatientNavbar: React.FC = () => {
                     <div className="text-xs font-bold text-slate-900">{user?.name}</div>
                     <div className="text-[11px] text-slate-500 truncate">{user?.email}</div>
                   </div>
+                  {(user?.role === 'doctor' || user?.role === 'admin') && (
+                    <Link
+                      to="/doctor/dashboard"
+                      onClick={() => setIsDropdownOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-[#0D7A5F] bg-[#E6F4F1] hover:bg-[#d5ede7] rounded-xl transition-colors mb-1"
+                    >
+                      <ShieldCheck className="w-4 h-4 text-[#0D7A5F]" /> Doctor Portal
+                    </Link>
+                  )}
                   <Link
                     to="/patient/dashboard"
                     onClick={() => setIsDropdownOpen(false)}

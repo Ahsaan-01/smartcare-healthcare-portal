@@ -52,7 +52,11 @@ export const LoginPage: React.FC = () => {
     const success = await login(data.email, data.password);
     if (success) {
       toast.success('Welcome back to SmartCare!');
-      navigate(redirectUrl);
+      if (data.email.trim().toLowerCase() === DEMO_CREDENTIALS.doctor.email) {
+        navigate('/doctor/dashboard');
+      } else {
+        navigate(redirectUrl);
+      }
     }
   };
 
@@ -63,7 +67,11 @@ export const LoginPage: React.FC = () => {
     const success = await loginAsDemo(role);
     if (success) {
       toast.success(`Logged in as Demo ${role.toUpperCase()}`);
-      navigate('/patient/dashboard');
+      if (role === 'doctor') {
+        navigate('/doctor/dashboard');
+      } else {
+        navigate('/patient/dashboard');
+      }
     }
   };
 

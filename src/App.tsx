@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { PublicLayout } from './layouts/PublicLayout';
 import { AuthLayout } from './layouts/AuthLayout';
 import { PatientLayout } from './layouts/PatientLayout';
+import { DoctorLayout } from './layouts/DoctorLayout';
 import { ProtectedRoute } from './layouts/ProtectedRoute';
 
 // Public Pages
@@ -25,6 +26,14 @@ import { BookAppointmentPage } from './pages/patient/BookAppointmentPage';
 import { AppointmentHistoryPage } from './pages/patient/AppointmentHistoryPage';
 import { FavouriteDoctorsPage } from './pages/patient/FavouriteDoctorsPage';
 import { NotificationsPage } from './pages/patient/NotificationsPage';
+
+// Doctor Portal Pages (Module 3)
+import { DoctorDashboard } from './pages/doctor/DoctorDashboard';
+import { DoctorAppointmentsPage } from './pages/doctor/DoctorAppointmentsPage';
+import { DoctorConsultationDetailPage } from './pages/doctor/DoctorConsultationDetailPage';
+import { DoctorSchedulePage } from './pages/doctor/DoctorSchedulePage';
+import { DoctorPatientsPage } from './pages/doctor/DoctorPatientsPage';
+import { DoctorAnalyticsPage } from './pages/doctor/DoctorAnalyticsPage';
 
 // Error Pages
 import { NotFoundPage } from './pages/errors/NotFoundPage';
@@ -51,7 +60,7 @@ export const App: React.FC = () => {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         </Route>
 
-        {/* Protected Patient Portal Routes */}
+        {/* Protected Patient Portal Routes (Modules 1 & 2) */}
         <Route
           path="/patient"
           element={
@@ -66,6 +75,24 @@ export const App: React.FC = () => {
           <Route path="appointments" element={<AppointmentHistoryPage />} />
           <Route path="favourites" element={<FavouriteDoctorsPage />} />
           <Route path="notifications" element={<NotificationsPage />} />
+        </Route>
+
+        {/* Protected Doctor Portal Routes (Module 3) */}
+        <Route
+          path="/doctor"
+          element={
+            <ProtectedRoute allowedRoles={['doctor', 'admin']}>
+              <DoctorLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Navigate to="/doctor/dashboard" replace />} />
+          <Route path="dashboard" element={<DoctorDashboard />} />
+          <Route path="appointments" element={<DoctorAppointmentsPage />} />
+          <Route path="consultations/:id" element={<DoctorConsultationDetailPage />} />
+          <Route path="schedule" element={<DoctorSchedulePage />} />
+          <Route path="patients" element={<DoctorPatientsPage />} />
+          <Route path="analytics" element={<DoctorAnalyticsPage />} />
         </Route>
 
         {/* 404 Catch-All */}

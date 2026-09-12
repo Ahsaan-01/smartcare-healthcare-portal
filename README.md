@@ -38,8 +38,14 @@
   - Cancellation modal with 6 predefined reasons, custom notes, and automatic notification dispatch.
   - Notification Center (`/patient/notifications`) and interactive topbar popover with unread badges.
   - Live patient dashboard sync displaying real-time upcoming appointment cards and counters.
-- [ ] **MODULE 3: Doctor Portal & Analytics** *(Upcoming)*
-  - Doctor dashboard, schedule manager (working hours, breaks, slot toggles), patient records list, and revenue analytics in PKR.
+- [x] **MODULE 3: Doctor Portal & Analytics** *(Completed)*
+  - Dedicated Doctor Portal Layout (`DoctorLayout`, `DoctorNavbar`, `DoctorSidebar`, `DoctorMobileNav`) with PMDC verification status (`PMDC # 48291-S`) and real-time duty status switcher (`Available`, `In Consultation`, `Break`, `Emergency Off`).
+  - Doctor Dashboard (`/doctor/dashboard`) featuring today's patient queue, active waiting count, "Next Patient Ready" action card, and daily gross revenue in PKR (`Rs. 9,750`).
+  - Comprehensive Consultation Workflow (`/doctor/consultations/:id`) with high-risk allergy alert banners, encrypted tele-health video call simulation, chief complaint & vitals entry, and interactive digital prescription pad writer.
+  - Official Clinical Prescription Pad (`PrescriptionModal`) featuring clinic letterhead, PMDC stamp, digital signature, Rx table, and print/save PDF action.
+  - Schedule & Availability Manager (`/doctor/schedule`) with shift timings (morning/evening), Friday prayer breaks, consultation duration/buffer options, emergency day-off trigger, and 7-day rolling slot availability matrix.
+  - Patient Medical Records Directory (`/doctor/patients`) with search by name/MRN/diagnosis, allergy filters, blood group tags, and patient clinical history drawers (`PatientDrawer`).
+  - Practice Revenue & Performance Analytics (`/doctor/analytics`) in PKR with gross revenue (`Rs. 485,000`), net clinic payout (90%), monthly comparative bars, consultation modality breakdown (In-Clinic vs Video), peak consultation hours, and CSV export.
 - [ ] **MODULE 4: Admin Portal, QA & Final Optimization** *(Upcoming)*
   - Platform management (doctors, patients, appointments, specialties), platform-wide analytics, settings, accessibility audit, and final polish.
 
@@ -72,8 +78,8 @@ smartcare-healthcare-portal/
 ├── src/
 │   ├── components/
 │   │   ├── common/             # Button, Input, Select, Badge, Card, Avatar, Modal, ToastContainer, SkeletonLoader, EmptyState, Breadcrumb, RatingStars, Logo
-│   │   ├── layout/             # PublicHeader, PublicFooter, PatientNavbar, PatientSidebar, MobileNav
-│   │   ├── doctor/             # DoctorCard, DoctorFilterSidebar, SpecialtyCard
+│   │   ├── layout/             # PublicHeader, PublicFooter, PatientNavbar, PatientSidebar, DoctorNavbar, DoctorSidebar, DoctorMobileNav, MobileNav
+│   │   ├── doctor/             # DoctorCard, DoctorFilterSidebar, SpecialtyCard, PrescriptionModal, PatientDrawer, ConsultationCancelModal
 │   │   └── appointment/        # BookingStepIndicator, ConsultationTypeSelector, DatePicker, TimeSlotGrid, BookingConfirmCard, AppointmentCard, CancellationModal, NotificationItem
 │   ├── data/
 │   │   ├── mockDoctors.ts      # 12+ realistic Pakistani doctors (Karachi, Lahore, Islamabad, etc.)
@@ -81,18 +87,21 @@ smartcare-healthcare-portal/
 │   │   ├── mockCities.ts       # Pakistani cities & sub-localities (Clifton, DHA, Gulshan, Blue Area)
 │   │   ├── mockReviews.ts      # Verified Pakistani patient reviews
 │   │   ├── mockPatients.ts     # Demo patient profile (Muhammad Tariq)
-│   │   ├── mockAppointments.ts # Mock appointment history (confirmed, completed, cancelled)
+│   │   ├── mockAppointments.ts # Rich appointment history for patient and Dr. Ayesha Khan
 │   │   ├── mockNotifications.ts# Mock notification feed entries
-│   │   └── mockSlots.ts        # 7-day rolling slot availability generator
+│   │   ├── mockSlots.ts        # 7-day rolling slot availability generator
+│   │   └── mockDoctorPortal.ts # Doctor schedule configs, patient records, initial prescriptions, analytics
 │   ├── layouts/
 │   │   ├── PublicLayout.tsx    # Header + Outlet + Footer + Toasts
 │   │   ├── AuthLayout.tsx      # Centered card layout for Auth
-│   │   ├── PatientLayout.tsx   # Navbar + Sidebar + MobileNav + Toasts
+│   │   ├── PatientLayout.tsx   # Patient Navbar + Sidebar + MobileNav + Toasts
+│   │   ├── DoctorLayout.tsx    # Doctor Navbar + Sidebar + MobileNav + Out-of-Office Banner + Toasts
 │   │   └── ProtectedRoute.tsx  # Role-based route guard
 │   ├── pages/
 │   │   ├── public/             # LandingPage, AboutPage, ContactPage
 │   │   ├── auth/               # LoginPage, SignupPage, ForgotPasswordPage
 │   │   ├── patient/            # PatientDashboard, DoctorDiscoveryPage, DoctorProfilePage, FavouriteDoctorsPage, BookAppointmentPage, AppointmentHistoryPage, NotificationsPage
+│   │   ├── doctor/             # DoctorDashboard, DoctorAppointmentsPage, DoctorConsultationDetailPage, DoctorSchedulePage, DoctorPatientsPage, DoctorAnalyticsPage
 │   │   └── errors/             # NotFoundPage, UnauthorizedPage
 │   ├── services/
 │   │   ├── doctorService.ts    # Filter, search, sort, and profile data service layer
@@ -102,9 +111,11 @@ smartcare-healthcare-portal/
 │   │   ├── useFavouritesStore.ts # Saved doctors state with localStorage persistence
 │   │   ├── useFilterStore.ts   # Active discovery search & filter state
 │   │   ├── useAppointmentStore.ts # Booking wizard, appointment management, notification feed
+│   │   ├── useDoctorStore.ts   # Doctor schedule, slot overrides, prescriptions, patient records, duty status
 │   │   └── useToastStore.ts    # Global notification toast queue
 │   ├── types/
 │   │   ├── doctor.ts           # Doctor, Specialty, PakistaniCity, Review types
+│   │   ├── doctorPortal.ts     # MedicationItem, DigitalPrescription, DoctorScheduleConfig, DoctorPatientRecord, DoctorAnalyticsSummary
 │   │   ├── user.ts             # User, PatientProfile, HealthProfile
 │   │   ├── filter.ts           # DoctorFilterState, SortOption
 │   │   └── appointment.ts      # Appointment, TimeSlot, DoctorSlotDay, Notification types
@@ -112,7 +123,7 @@ smartcare-healthcare-portal/
 │   │   ├── formatters.ts       # formatPKR, formatPhonePK
 │   │   ├── constants.ts        # Pakistani cities, default filters, demo credentials
 │   │   └── cn.ts               # clsx + twMerge utility
-│   ├── App.tsx                 # Route configuration
+│   ├── App.tsx                 # Full route configuration (Public, Auth, Patient, Doctor)
 │   ├── index.css               # Clinical CSS tokens & Tailwind imports
 │   └── main.tsx                # Entry point
 ├── index.html                      # Root HTML entry point (Google Fonts, app mount)
@@ -135,7 +146,7 @@ Quick **1-Click Demo Login** buttons are embedded directly on the Login page (`/
 | Role | Email | Password | Default Landing |
 | :--- | :--- | :--- | :--- |
 | **Patient** | `patient@smartcare.pk` | `patient123` | `/patient/dashboard` |
-| **Doctor** | `doctor@smartcare.pk` | `doctor123` | `/patient/dashboard` (Module 1 preview) |
+| **Doctor** | `doctor@smartcare.pk` | `doctor123` | `/doctor/dashboard` *(Module 3 Live)* |
 | **Admin** | `admin@smartcare.pk` | `admin123` | `/patient/dashboard` (Module 1 preview) |
 
 ---
