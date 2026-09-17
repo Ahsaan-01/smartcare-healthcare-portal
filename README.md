@@ -46,8 +46,16 @@
   - Schedule & Availability Manager (`/doctor/schedule`) with shift timings (morning/evening), Friday prayer breaks, consultation duration/buffer options, emergency day-off trigger, and 7-day rolling slot availability matrix.
   - Patient Medical Records Directory (`/doctor/patients`) with search by name/MRN/diagnosis, allergy filters, blood group tags, and patient clinical history drawers (`PatientDrawer`).
   - Practice Revenue & Performance Analytics (`/doctor/analytics`) in PKR with gross revenue (`Rs. 485,000`), net clinic payout (90%), monthly comparative bars, consultation modality breakdown (In-Clinic vs Video), peak consultation hours, and CSV export.
-- [ ] **MODULE 4: Admin Portal, QA & Final Optimization** *(Upcoming)*
-  - Platform management (doctors, patients, appointments, specialties), platform-wide analytics, settings, accessibility audit, and final polish.
+- [x] **MODULE 4: Admin Portal, QA & Final Optimization** *(Completed)*
+  - Dedicated Super Admin Portal Layout (`AdminLayout`, `AdminNavbar`, `AdminSidebar`, `AdminMobileNav`) featuring platform operational status, maintenance banner, live telemetry audit feed popover, and 1-click cross-portal navigation.
+  - Super Admin Dashboard (`/admin/dashboard`) with 5 macro KPI cards in PKR (Gross Platform GMV `Rs. 3.85M`, Net Take `Rs. 385,000`, Active Doctors `14`, Patients `1,840`, Consultations `1,280`), urgent PMDC verification queue, city distribution, and real-time audit feed.
+  - Doctor Directory & PMDC Credential Audit (`/admin/doctors`) with multi-tab status filters (Verified, Pending PMDC Review, Suspended), `VerifyDoctorModal` with license validation/rejection notes, `AddDoctorModal` to register new specialists, inline consultation fee adjustments, and featured specialist toggles.
+  - Platform-wide Patient Management (`/admin/patients`) with blood group filters, search by name/MRN, and confidential medical history drawers (`PatientDrawer`).
+  - Nationwide Consultation Oversight (`/admin/appointments`) with status filtering (Upcoming, Completed, Cancelled), admin cancellation override, and simulated instant PKR refund triggers.
+  - Medical Specialties Taxonomy Manager (`/admin/specialties`) with interactive `SpecialtyModal` to create and update departments, icon selectors, and clinical condition tag mappings.
+  - Platform Financial & Operational Analytics (`/admin/analytics`) with 6-month GMV growth trajectory in PKR, city market share (Karachi 48%, Lahore 32%, Islamabad 15%), consultation modality breakdown, and 1-click CSV report export.
+  - Platform Governance & System Diagnostics (`/admin/settings`) with platform commission rate slider (10%), tele-health discount toggle, national 24/7 emergency hotline setter (`021-111-762-782`), system maintenance mode toggle, platform-wide announcement broadcast composer (`BroadcastModal`), and demo state baseline reset.
+  - Full TypeScript strictness (`tsc -b && vite build` clean with 0 errors).
 
 ---
 
@@ -78,9 +86,10 @@ smartcare-healthcare-portal/
 ├── src/
 │   ├── components/
 │   │   ├── common/             # Button, Input, Select, Badge, Card, Avatar, Modal, ToastContainer, SkeletonLoader, EmptyState, Breadcrumb, RatingStars, Logo
-│   │   ├── layout/             # PublicHeader, PublicFooter, PatientNavbar, PatientSidebar, DoctorNavbar, DoctorSidebar, DoctorMobileNav, MobileNav
+│   │   ├── layout/             # PublicHeader, PublicFooter, PatientNavbar, PatientSidebar, DoctorNavbar, DoctorSidebar, DoctorMobileNav, AdminNavbar, AdminSidebar, AdminMobileNav, MobileNav
 │   │   ├── doctor/             # DoctorCard, DoctorFilterSidebar, SpecialtyCard, PrescriptionModal, PatientDrawer, ConsultationCancelModal
-│   │   └── appointment/        # BookingStepIndicator, ConsultationTypeSelector, DatePicker, TimeSlotGrid, BookingConfirmCard, AppointmentCard, CancellationModal, NotificationItem
+│   │   ├── appointment/        # BookingStepIndicator, ConsultationTypeSelector, DatePicker, TimeSlotGrid, BookingConfirmCard, AppointmentCard, CancellationModal, NotificationItem
+│   │   └── admin/              # VerifyDoctorModal, AddDoctorModal, SpecialtyModal, BroadcastModal
 │   ├── data/
 │   │   ├── mockDoctors.ts      # 12+ realistic Pakistani doctors (Karachi, Lahore, Islamabad, etc.)
 │   │   ├── mockSpecialties.ts  # 12 medical specialties with clinical descriptions
@@ -90,18 +99,21 @@ smartcare-healthcare-portal/
 │   │   ├── mockAppointments.ts # Rich appointment history for patient and Dr. Ayesha Khan
 │   │   ├── mockNotifications.ts# Mock notification feed entries
 │   │   ├── mockSlots.ts        # 7-day rolling slot availability generator
-│   │   └── mockDoctorPortal.ts # Doctor schedule configs, patient records, initial prescriptions, analytics
+│   │   ├── mockDoctorPortal.ts # Doctor schedule configs, patient records, initial prescriptions, analytics
+│   │   └── mockAdminData.ts    # Admin doctors with PMDC statuses, audit logs, metrics summary in PKR
 │   ├── layouts/
 │   │   ├── PublicLayout.tsx    # Header + Outlet + Footer + Toasts
 │   │   ├── AuthLayout.tsx      # Centered card layout for Auth
 │   │   ├── PatientLayout.tsx   # Patient Navbar + Sidebar + MobileNav + Toasts
 │   │   ├── DoctorLayout.tsx    # Doctor Navbar + Sidebar + MobileNav + Out-of-Office Banner + Toasts
+│   │   ├── AdminLayout.tsx     # Admin Navbar + Sidebar + MobileNav + Maintenance Banner + Broadcast Bar + Toasts
 │   │   └── ProtectedRoute.tsx  # Role-based route guard
 │   ├── pages/
 │   │   ├── public/             # LandingPage, AboutPage, ContactPage
 │   │   ├── auth/               # LoginPage, SignupPage, ForgotPasswordPage
 │   │   ├── patient/            # PatientDashboard, DoctorDiscoveryPage, DoctorProfilePage, FavouriteDoctorsPage, BookAppointmentPage, AppointmentHistoryPage, NotificationsPage
 │   │   ├── doctor/             # DoctorDashboard, DoctorAppointmentsPage, DoctorConsultationDetailPage, DoctorSchedulePage, DoctorPatientsPage, DoctorAnalyticsPage
+│   │   ├── admin/              # AdminDashboard, AdminDoctorsPage, AdminPatientsPage, AdminAppointmentsPage, AdminSpecialtiesPage, AdminAnalyticsPage, AdminSettingsPage
 │   │   └── errors/             # NotFoundPage, UnauthorizedPage
 │   ├── services/
 │   │   ├── doctorService.ts    # Filter, search, sort, and profile data service layer
@@ -112,10 +124,12 @@ smartcare-healthcare-portal/
 │   │   ├── useFilterStore.ts   # Active discovery search & filter state
 │   │   ├── useAppointmentStore.ts # Booking wizard, appointment management, notification feed
 │   │   ├── useDoctorStore.ts   # Doctor schedule, slot overrides, prescriptions, patient records, duty status
+│   │   ├── useAdminStore.ts    # Admin doctors, PMDC audits, specialties manager, system settings, maintenance mode, audit logs
 │   │   └── useToastStore.ts    # Global notification toast queue
 │   ├── types/
 │   │   ├── doctor.ts           # Doctor, Specialty, PakistaniCity, Review types
 │   │   ├── doctorPortal.ts     # MedicationItem, DigitalPrescription, DoctorScheduleConfig, DoctorPatientRecord, DoctorAnalyticsSummary
+│   │   ├── admin.ts            # AdminDoctorRecord, PlatformActivityLog, AdminSystemSettings, PlatformMetricsSummary
 │   │   ├── user.ts             # User, PatientProfile, HealthProfile
 │   │   ├── filter.ts           # DoctorFilterState, SortOption
 │   │   └── appointment.ts      # Appointment, TimeSlot, DoctorSlotDay, Notification types
@@ -123,7 +137,7 @@ smartcare-healthcare-portal/
 │   │   ├── formatters.ts       # formatPKR, formatPhonePK
 │   │   ├── constants.ts        # Pakistani cities, default filters, demo credentials
 │   │   └── cn.ts               # clsx + twMerge utility
-│   ├── App.tsx                 # Full route configuration (Public, Auth, Patient, Doctor)
+│   ├── App.tsx                 # Full route configuration (Public, Auth, Patient, Doctor, Admin)
 │   ├── index.css               # Clinical CSS tokens & Tailwind imports
 │   └── main.tsx                # Entry point
 ├── index.html                      # Root HTML entry point (Google Fonts, app mount)
@@ -143,11 +157,11 @@ smartcare-healthcare-portal/
 
 Quick **1-Click Demo Login** buttons are embedded directly on the Login page (`/login`):
 
-| Role | Email | Password | Default Landing |
-| :--- | :--- | :--- | :--- |
-| **Patient** | `patient@smartcare.pk` | `patient123` | `/patient/dashboard` |
-| **Doctor** | `doctor@smartcare.pk` | `doctor123` | `/doctor/dashboard` *(Module 3 Live)* |
-| **Admin** | `admin@smartcare.pk` | `admin123` | `/patient/dashboard` (Module 1 preview) |
+| Role | Email | Password | Default Landing | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| **Patient** | `patient@smartcare.pk` | `patient123` | `/patient/dashboard` | Ready (Modules 1 & 2) |
+| **Doctor** | `doctor@smartcare.pk` | `doctor123` | `/doctor/dashboard` | Ready (Module 3) |
+| **Admin** | `admin@smartcare.pk` | `admin123` | `/admin/dashboard` | Ready (Module 4) |
 
 ---
 

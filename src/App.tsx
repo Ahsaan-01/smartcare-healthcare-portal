@@ -35,6 +35,16 @@ import { DoctorSchedulePage } from './pages/doctor/DoctorSchedulePage';
 import { DoctorPatientsPage } from './pages/doctor/DoctorPatientsPage';
 import { DoctorAnalyticsPage } from './pages/doctor/DoctorAnalyticsPage';
 
+// Admin Portal Pages (Module 4)
+import { AdminLayout } from './layouts/AdminLayout';
+import { AdminDashboard } from './pages/admin/AdminDashboard';
+import { AdminDoctorsPage } from './pages/admin/AdminDoctorsPage';
+import { AdminPatientsPage } from './pages/admin/AdminPatientsPage';
+import { AdminAppointmentsPage } from './pages/admin/AdminAppointmentsPage';
+import { AdminSpecialtiesPage } from './pages/admin/AdminSpecialtiesPage';
+import { AdminAnalyticsPage } from './pages/admin/AdminAnalyticsPage';
+import { AdminSettingsPage } from './pages/admin/AdminSettingsPage';
+
 // Error Pages
 import { NotFoundPage } from './pages/errors/NotFoundPage';
 import { UnauthorizedPage } from './pages/errors/UnauthorizedPage';
@@ -93,6 +103,25 @@ export const App: React.FC = () => {
           <Route path="schedule" element={<DoctorSchedulePage />} />
           <Route path="patients" element={<DoctorPatientsPage />} />
           <Route path="analytics" element={<DoctorAnalyticsPage />} />
+        </Route>
+
+        {/* Protected Admin Portal Routes (Module 4) */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Navigate to="/admin/dashboard" replace />} />
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="doctors" element={<AdminDoctorsPage />} />
+          <Route path="patients" element={<AdminPatientsPage />} />
+          <Route path="appointments" element={<AdminAppointmentsPage />} />
+          <Route path="specialties" element={<AdminSpecialtiesPage />} />
+          <Route path="analytics" element={<AdminAnalyticsPage />} />
+          <Route path="settings" element={<AdminSettingsPage />} />
         </Route>
 
         {/* 404 Catch-All */}
