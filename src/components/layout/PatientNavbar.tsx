@@ -192,6 +192,15 @@ export const PatientNavbar: React.FC = () => {
                     <div className="text-xs font-bold text-slate-900">{user?.name}</div>
                     <div className="text-[11px] text-slate-500 truncate">{user?.email}</div>
                   </div>
+                  {user?.role === 'admin' && (
+                    <Link
+                      to="/admin/dashboard"
+                      onClick={() => setIsDropdownOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-amber-800 bg-amber-50 hover:bg-amber-100 rounded-xl transition-colors mb-1"
+                    >
+                      <ShieldCheck className="w-4 h-4 text-amber-600" /> Admin Console
+                    </Link>
+                  )}
                   {(user?.role === 'doctor' || user?.role === 'admin') && (
                     <Link
                       to="/doctor/dashboard"

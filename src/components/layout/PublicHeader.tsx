@@ -9,7 +9,8 @@ import {
   LogOut,
   ChevronDown,
   ShieldCheck,
-  PhoneCall
+  PhoneCall,
+  Stethoscope
 } from 'lucide-react';
 import { Logo } from '../common/Logo';
 import { Button } from '../common/Button';
@@ -139,6 +140,24 @@ export const PublicHeader: React.FC = () => {
                       <div className="text-xs font-bold text-slate-900">{user.name}</div>
                       <div className="text-[11px] text-slate-500 truncate">{user.email}</div>
                     </div>
+                    {user.role === 'admin' && (
+                      <Link
+                        to="/admin/dashboard"
+                        onClick={() => setIsUserMenuOpen(false)}
+                        className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-amber-800 bg-amber-50 hover:bg-amber-100 rounded-xl transition-colors mb-1"
+                      >
+                        <ShieldCheck className="w-4 h-4 text-amber-600" /> Admin Console
+                      </Link>
+                    )}
+                    {user.role === 'doctor' && (
+                      <Link
+                        to="/doctor/dashboard"
+                        onClick={() => setIsUserMenuOpen(false)}
+                        className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-[#0D7A5F] bg-[#E6F4F1] hover:bg-[#d5ede7] rounded-xl transition-colors mb-1"
+                      >
+                        <Stethoscope className="w-4 h-4 text-[#0D7A5F]" /> Doctor Portal
+                      </Link>
+                    )}
                     <Link
                       to="/patient/dashboard"
                       onClick={() => setIsUserMenuOpen(false)}
@@ -228,6 +247,24 @@ export const PublicHeader: React.FC = () => {
           <div className="pt-3 border-t border-slate-100 space-y-2">
             {isAuthenticated && user ? (
               <>
+                {user.role === 'admin' && (
+                  <Link
+                    to="/admin/dashboard"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-amber-800 bg-amber-50 rounded-xl"
+                  >
+                    <ShieldCheck className="w-4 h-4 text-amber-600" /> Admin Console
+                  </Link>
+                )}
+                {user.role === 'doctor' && (
+                  <Link
+                    to="/doctor/dashboard"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-teal-800 bg-teal-50 rounded-xl"
+                  >
+                    <Stethoscope className="w-4 h-4 text-[#0D7A5F]" /> Doctor Portal
+                  </Link>
+                )}
                 <Link
                   to="/patient/dashboard"
                   onClick={() => setIsMobileMenuOpen(false)}

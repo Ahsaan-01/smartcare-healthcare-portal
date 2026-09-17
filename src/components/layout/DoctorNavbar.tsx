@@ -292,6 +292,17 @@ export const DoctorNavbar: React.FC = () => {
                     <span>Switch to Patient View</span>
                   </Link>
 
+                  {user?.role === 'admin' && (
+                    <Link
+                      to="/admin/dashboard"
+                      onClick={() => setIsProfileOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-xl transition-all"
+                    >
+                      <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
+                      <span>Admin Console</span>
+                    </Link>
+                  )}
+
                   <div className="border-t border-slate-100 mt-1 pt-1">
                     <button
                       type="button"
